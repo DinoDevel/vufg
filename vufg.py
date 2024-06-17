@@ -949,26 +949,26 @@ def is_range_arguments_correct(range_from: int, range_to: int):
         return False
     return True
 
+def add_filter(filter_id):
+    hexcount = format(filter_id, '04x')
+    device_filter = ET.SubElement(elem_device_filters, "DeviceFilter", name="Filter 0x" + hexcount, active="true",
+                                  vendorId=hexcount, remote="0")
+    device_filter.tail = "\n"
+    return ()
 
 def gen_filters_range_good(range_from, range_to, elem_device_filters):
     counter = range_from
     while counter <= range_to:
         if counter in valid_vids:
-            hexcount = format(counter, '04x')
-            device_filter = ET.SubElement(elem_device_filters, "DeviceFilter", name="Filter 0x" + hexcount,
-                                          active="true", vendorId=hexcount, remote="0")
-            device_filter.tail = "\n"
+            add_filter(counter)
         counter += 1
     return ()
 
 
-def gen_filters_range_all(range_from, range_to):
+def gen_filters_range_all(range_from, range_to, elem_device_filters):
     counter = range_from
     while counter <= range_to:
-        hexcount = format(counter, '04x')
-        device_filter = ET.SubElement(elem_device_filters, "DeviceFilter", name="Filter 0x" + hexcount, active="true",
-                                      vendorId=hexcount, remote="0")
-        device_filter.tail = "\n"
+        add_filter(counter)
         counter += 1
     return ()
 
@@ -1010,6 +1010,7 @@ if __name__ == '__main__':
         else:
             gen_filters_range_good(args.r_from, args.r_to, elem_device_filters)
 
-    ET.register_namespace("", "http://www.virtualbox.org/")
-    tree.write(args.filename.name, encoding='utf-8')
-    print("Filters added.")
+        ET.register_namespace("", "http://www.virtualbox.org/")
+        tree.write(args.filename.name, encoding='utf-8')
+        print("Filters added.")
+
